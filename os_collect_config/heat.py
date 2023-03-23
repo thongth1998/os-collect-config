@@ -39,6 +39,11 @@ opts = [
                help='Name of resource in the stack to be polled'),
     cfg.StrOpt('region-name',
                help='Region Name for extracting Heat endpoint'),
+    cfg.BoolOpt('ssl-certificate-validation',
+                help='ssl certificat validation flag for connect to heat',
+                default=False),
+    cfg.StrOpt('ca-file',
+               help='CA Cert file for connect to heat'),
 ]
 name = 'heat'
 
@@ -71,6 +76,12 @@ class Collector(object):
         if CONF.heat.resource_name is None:
             logger.info('No resource_name configured.')
             raise exc.HeatMetadataNotConfigured
+        if CONF.heat.ssl_certificate_validation is None:
+            logger.info('No ssl_certificate_validation configured.')
+            raise exc.HeatMetadataNotConfigured
+        if CONF.heat.ca_file is None:
+            logger.info('No ca_file configured.')
+            raise exc.HeatMetadataNotConfigured
         # NOTE(flwang): To be compatible with old versions, we won't throw
         # error here if there is no region name.
 
@@ -80,6 +91,8 @@ class Collector(object):
                 user_id=CONF.heat.user_id,
                 password=CONF.heat.password,
                 project_id=CONF.heat.project_id,
+                ca_file=CONF.heat.ca_file,
+                ssl_certificate_validation=CONF.heat.ssl_certificate_validation,
                 keystoneclient=self.keystoneclient,
                 discover_class=self.discover_class).client
             kwargs = {'service_type': 'orchestration',
