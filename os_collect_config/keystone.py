@@ -43,7 +43,7 @@ class Keystone(object):
     def __init__(self, auth_url, user_id, password, project_id,
                  keystoneclient=None, discover_class=None):
         '''Initialize Keystone wrapper.
-
+        
         @param string auth_url   auth_url for keystoneclient
         @param string user_id    user_id for keystoneclient
         @param string project_id project_id for keystoneclient
@@ -94,19 +94,23 @@ class Keystone(object):
             ref = self._get_auth_ref_from_cache()
             if ref:
                 self._client = self.keystoneclient.Client(
-                    auth_ref=ref)
+                    auth_ref=ref,
+                    cacert='/var/lib/ca.crt')
             else:
                 self._client = self.keystoneclient.Client(
                     auth_url=self.auth_url,
                     user_id=self.user_id,
                     password=self.password,
-                    project_id=self.project_id)
+                    project_id=self.project_id,
+                    cacert='/var/lib/ca.crt')
         return self._client
 
     def _get_auth_ref_from_cache(self):
         if self.cache:
             key = self._make_key('auth_ref')
             return self.cache.get(key)
+
+
 
     @property
     def auth_ref(self):
@@ -129,3 +133,4 @@ class Keystone(object):
         except ks_exc.AuthorizationFailure:
             self.invalidate_auth_ref()
             return self.client.service_catalog
+
