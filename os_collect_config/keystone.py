@@ -94,15 +94,16 @@ class Keystone(object):
             ref = self._get_auth_ref_from_cache()
             if ref:
                 self._client = self.keystoneclient.Client(
-                    auth_ref=ref,
-                    cacert='/var/lib/ca.crt')
+                    auth_ref=ref, insecure=True)
+                    # cacert='/var/lib/ca.crt')
             else:
                 self._client = self.keystoneclient.Client(
                     auth_url=self.auth_url,
                     user_id=self.user_id,
                     password=self.password,
                     project_id=self.project_id,
-                    cacert='/var/lib/ca.crt')
+                    insecure=True)
+                    # cacert='/var/lib/ca.crt')
         return self._client
 
     def _get_auth_ref_from_cache(self):
@@ -133,4 +134,3 @@ class Keystone(object):
         except ks_exc.AuthorizationFailure:
             self.invalidate_auth_ref()
             return self.client.service_catalog
-
